@@ -1,0 +1,31 @@
+.env
+# Entornos virtuales
+venv/
+.env
+__pycache__/
+*.pyc
+
+# Config de Python
+*.pyo
+*.pyd
+*.pyc
+*.p~  
+
+# Archivos de log
+*.log
+
+# Archivos de bases de datos locales
+*.sqlite3
+
+# Archivos de sistema
+.DS_Store
+Thumbs.db
+
+# Railway u otros entornos
+*.sqlite
+instance/
+.env.*
+
+# PyCharm / VSCode
+.idea/
+.vscode/
