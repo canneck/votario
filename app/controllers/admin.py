@@ -1,6 +1,6 @@
 from flask import jsonify, g
 from app.models import db, Role
-from app.utils.security import require_api_key, jwt_required
+from app.utils.security import require_api_key, jwt_required, role_required
 
 @require_api_key('ADMIN_API_KEY')
 def home():
@@ -9,6 +9,7 @@ def home():
 
 @require_api_key('ADMIN_API_KEY')
 @jwt_required
+@role_required('admin')
 def seed_roles():
     from flask import jsonify
     from app.models import db, Role

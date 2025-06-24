@@ -4,6 +4,7 @@ from flask import request, jsonify, g
 import jwt
 import datetime
 import os
+from app.models import User
 
 def require_api_key(env_key_name='ADMIN_API_KEY'):
     """
@@ -70,3 +71,41 @@ def jwt_required(f):
 
         return f(*args, **kwargs)
     return decorated
+
+
+def active_user_required(f):
+    @wraps(f)
+    def decorated(*args, **kwargs):
+        user_id = g.user.get('user_id')
+        user = User.query.get(user_id)
+
+        if not user:
+            return jsonify({'error': 'User not found'}), 404
+        if user.status != 'active':
+            return jsonify({'error': 'User is not active'}), 403
+
+        g.user_db = user  # opcional: guarda el objeto completo si lo necesitas en la vista
+
+        return f(*args, **kwargs)
+    return decorated
+
+
+def role_required(*allowed_roles):
+    """
+    Asegura que el usuario tenga uno de los roles permitidos.
+    Debe usarse después de @jwt_required.
+    Ejemplo: @role_required('admin', 'moderator')
+    """
+    def decorator(f):
+        @wraps(f)
+        def decorated_function(*args, **kwargs):
+            if not hasattr(g, 'user'):
+                return jsonify({'error': 'User context not found'}), 403
+
+            user_role = g.user.get('role')
+            if user_role not in allowed_roles:
+                return jsonify({'error': f'Unauthorized: role "{user_role}" not allowed'}), 403
+
+            return f(*args, **kwargs)
+        return decorated_function
+    return decorator

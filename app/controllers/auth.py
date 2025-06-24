@@ -2,10 +2,12 @@ from flask import request, jsonify, g
 from werkzeug.security import generate_password_hash, check_password_hash
 from app.models import db, User
 import datetime
-from app.utils.security import require_api_key, generate_jwt, jwt_required
+from app.utils.security import require_api_key, generate_jwt, jwt_required, active_user_required, role_required
 
 @require_api_key('AUTH_API_KEY')
 @jwt_required
+@active_user_required
+@role_required('admin', 'moderator')
 def protected_route():
     return jsonify({
         "message": "Acceso autorizado ✅",
