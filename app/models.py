@@ -132,3 +132,14 @@ class Vote(db.Model):
 
     def __repr__(self):
         return f'<Vote user={self.user_id} section={self.section_id} option={self.option_id}>'
+
+
+class RequestLog(db.Model):
+    __tablename__ = 'vt_request_logs'
+    id = db.Column(db.Integer, primary_key=True)
+    ip = db.Column(db.String(45), nullable=False, index=True)
+    route = db.Column(db.String(100), nullable=False)
+    user_id = db.Column(db.Integer, nullable=True)
+    timestamp = db.Column(db.DateTime, default=datetime.utcnow, index=True)
+
+
