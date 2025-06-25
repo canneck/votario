@@ -16,7 +16,6 @@ def protected_route():
     }), 200
 
 @require_api_key('AUTH_API_KEY')
-@jwt_required
 def register():
     data = request.get_json()
 
@@ -52,14 +51,33 @@ def login():
 
     user = User.query.filter_by(email=data['email']).first()
 
-    if not user or not check_password_hash(user.password, data['password']):
+    if not user:
         return jsonify({"error": "Invalid credentials"}), 401
 
-    # Ahora usamos JWT real
+    # Si está bloqueado por intentos
+    if user.status == 'inactive_max_login_attempts':
+        return jsonify({"error": "Account locked due to too many failed login attempts"}), 403
+
+    # Verificamos la contraseña
+    if not check_password_hash(user.password, data['password']):
+        user.failed_login_attempts = (user.failed_login_attempts or 0) + 1
+
+        # Si supera el límite
+        if user.failed_login_attempts >= 3:
+            user.status = 'inactive_max_login_attempts'
+
+        db.session.commit()
+
+        return jsonify({"error": "Invalid credentials"}), 401
+
+    # Si llegó aquí, el login fue exitoso
+    user.failed_login_attempts = 0  # Resetear intentos fallidos
+    db.session.commit()
+
     token = generate_jwt(user.id, user.role.name)
 
     return jsonify({
-        "message": "Login ok",
+        "message": "Login successful",
         "user": {
             "id": user.id,
             "email": user.email,
@@ -70,7 +88,6 @@ def login():
 
 
 @require_api_key('AUTH_API_KEY')
-@jwt_required
 def seed_users():
     sample_users = [
         {"email": "admin@votario.com", "password": "admin123", "role_id": 1},

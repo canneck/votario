@@ -8,8 +8,6 @@ def home():
 
 
 @require_api_key('ADMIN_API_KEY')
-@jwt_required
-@role_required('admin')
 def seed_roles():
     from flask import jsonify
     from app.models import db, Role

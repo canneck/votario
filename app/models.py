@@ -43,6 +43,8 @@ class User(db.Model, AuditMixin):
     region = db.Column(db.String(50), nullable=True)     # Departamento
     province = db.Column(db.String(50), nullable=True)
     district = db.Column(db.String(50), nullable=True)
+    
+    failed_login_attempts = db.Column(db.Integer, default=0)
 
     # Internal login credentials
     email = db.Column(db.String(120), unique=True, nullable=False)
