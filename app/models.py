@@ -143,3 +143,17 @@ class RequestLog(db.Model):
     timestamp = db.Column(db.DateTime, default=datetime.utcnow, index=True)
 
 
+class VotingLocation(db.Model, AuditMixin):
+    __tablename__ = 'vt_voting_locations'
+
+    id = db.Column(db.Integer, primary_key=True)
+    name = db.Column(db.String(100), nullable=False)
+    coordinates = db.Column(db.String(50), nullable=True)  # Ej: "12.345678,-76.543210"
+    address = db.Column(db.String(200))
+    region = db.Column(db.String(50), nullable=False)
+    province = db.Column(db.String(50), nullable=False)
+    district = db.Column(db.String(50), nullable=False)
+    api_key = db.Column(db.String(64), unique=True, nullable=False)
+
+    def __repr__(self):
+        return f"<VotingLocation {self.name}>"
