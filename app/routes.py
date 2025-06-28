@@ -1,5 +1,5 @@
 from flask import Blueprint
-from app.controllers import admin, auth, votes, events, sections
+from app.controllers import admin, auth, votes, events, sections, options
 
 votario = Blueprint('votario', __name__)
 
@@ -31,3 +31,11 @@ votario.add_url_rule('/sections/<int:section_id>', view_func=sections.get_by_id,
 votario.add_url_rule('/sections/<int:section_id>', view_func=sections.update, methods=['PUT'])
 votario.add_url_rule('/sections/<int:section_id>/status', view_func=sections.update_status, methods=['PATCH'])
 votario.add_url_rule('/sections/<int:section_id>', view_func=sections.delete, methods=['DELETE'])
+
+# options
+votario.add_url_rule('/options', view_func=options.create, methods=['POST'])
+votario.add_url_rule('/options', view_func=options.get_all, methods=['GET'])
+votario.add_url_rule('/options/<int:option_id>', view_func=options.get_by_id, methods=['GET'])
+votario.add_url_rule('/options/<int:option_id>', view_func=options.update, methods=['PUT'])
+votario.add_url_rule('/options/<int:option_id>/status', view_func=options.update_status, methods=['PATCH'])
+votario.add_url_rule('/options/<int:option_id>', view_func=options.delete, methods=['DELETE'])
