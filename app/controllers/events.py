@@ -1,4 +1,4 @@
-from flask import request, jsonify
+from flask import request, jsonify, g
 from app.models import db, Event
 from app.utils.security import require_api_key, jwt_required, role_required, active_user_required
 from datetime import datetime
@@ -33,7 +33,8 @@ def create():
         district=data.get('district'),
         is_public=data.get('is_public', False),
         require_authentication=data.get('require_authentication', True),
-        allow_multiple_votes=data.get('allow_multiple_votes', False)
+        allow_multiple_votes=data.get('allow_multiple_votes', False),
+        created_by = g.user['user_id']
     )
 
     db.session.add(new_event)
@@ -99,6 +100,8 @@ def update(event_id):
         if field in data:
             setattr(event, field, data[field])
 
+    event.modified_by = g.user['user_id']
+    
     db.session.commit()
     return jsonify({"message": "Event updated"}), 200
 
@@ -119,6 +122,7 @@ def update_status(event_id):
         return jsonify({"error": "Event not found"}), 404
 
     event.status = new_status
+    event.modified_by = g.user['user_id']
     db.session.commit()
 
     return jsonify({"message": f"Event status updated to '{new_status}'"}), 200
@@ -135,5 +139,6 @@ def delete(event_id):
         return jsonify({"error": "Event not found"}), 404
 
     event.status = 'deleted'
+    event.modified_by = g.user['user_id']
     db.session.commit()
     return jsonify({"message": "Event deleted (soft)"}), 200

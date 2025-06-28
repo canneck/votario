@@ -80,6 +80,8 @@ def update(section_id):
         if field in data:
             setattr(section, field, data[field])
 
+    section.modified_by = g.user['user_id']
+
     db.session.commit()
     return jsonify({"message": "Section updated"}), 200
 
@@ -98,8 +100,9 @@ def update_status(section_id):
     section = Section.query.get(section_id)
     if not section or section.status == 'deleted':
         return jsonify({"error": "Section not found"}), 404
-
+    
     section.status = new_status
+    section.modified_by = g.user['user_id']
     db.session.commit()
 
     return jsonify({"message": f"Section status updated to '{new_status}'"}), 200
@@ -116,5 +119,6 @@ def delete(section_id):
         return jsonify({"error": "Section not found"}), 404
 
     section.status = 'deleted'
+    section.modified_by = g.user['user_id']
     db.session.commit()
     return jsonify({"message": "Section deleted (soft)"}), 200

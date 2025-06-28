@@ -93,6 +93,8 @@ def update(option_id):
         if field in data:
             setattr(option, field, data[field])
 
+    option.modified_by = g.user['user_id']
+
     db.session.commit()
     return jsonify({"message": "Option updated"}), 200
 
@@ -113,6 +115,7 @@ def update_status(option_id):
         return jsonify({"error": "Option not found"}), 404
 
     option.status = new_status
+    option.modified_by = g.user['user_id']
     db.session.commit()
 
     return jsonify({"message": f"Option status updated to '{new_status}'"}), 200
@@ -129,5 +132,6 @@ def delete(option_id):
         return jsonify({"error": "Option not found"}), 404
 
     option.status = 'deleted'
+    option.modified_by = g.user['user_id']
     db.session.commit()
     return jsonify({"message": "Option deleted (soft)"}), 200
